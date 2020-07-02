@@ -1,10 +1,3 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
 
 package io.backend.modules.sys.service.impl;
 
@@ -12,7 +5,7 @@ package io.backend.modules.sys.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.code.kaptcha.Producer;
-import io.backend.common.exception.RRException;
+import io.backend.common.exception.BackendException;
 import io.backend.common.utils.DateUtils;
 import io.backend.modules.sys.dao.SysCaptchaDao;
 import io.backend.modules.sys.entity.SysCaptchaEntity;
@@ -27,7 +20,6 @@ import java.util.Date;
 /**
  * 验证码
  *
- * @author Mark sunlightcs@gmail.com
  */
 @Service("sysCaptchaService")
 public class SysCaptchaServiceImpl extends ServiceImpl<SysCaptchaDao, SysCaptchaEntity> implements SysCaptchaService {
@@ -37,7 +29,7 @@ public class SysCaptchaServiceImpl extends ServiceImpl<SysCaptchaDao, SysCaptcha
     @Override
     public BufferedImage getCaptcha(String uuid) {
         if(StringUtils.isBlank(uuid)){
-            throw new RRException("uuid不能为空");
+            throw new BackendException("uuid不能为空");
         }
         //生成文字验证码
         String code = producer.createText();

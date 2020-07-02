@@ -1,10 +1,3 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
 
 package io.backend.modules.oss.cloud;
 
@@ -13,7 +6,7 @@ import com.qiniu.http.Response;
 import com.qiniu.storage.Configuration;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.util.Auth;
-import io.backend.common.exception.RRException;
+import io.backend.common.exception.BackendException;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -22,7 +15,6 @@ import java.io.InputStream;
 /**
  * 七牛云存储
  *
- * @author Mark sunlightcs@gmail.com
  */
 public class QiniuCloudStorageService extends CloudStorageService {
     private UploadManager uploadManager;
@@ -49,7 +41,7 @@ public class QiniuCloudStorageService extends CloudStorageService {
                 throw new RuntimeException("上传七牛出错：" + res.toString());
             }
         } catch (Exception e) {
-            throw new RRException("上传文件失败，请核对七牛配置信息", e);
+            throw new BackendException("上传文件失败，请核对七牛配置信息", e);
         }
 
         return config.getQiniuDomain() + "/" + path;
@@ -61,7 +53,7 @@ public class QiniuCloudStorageService extends CloudStorageService {
             byte[] data = IOUtils.toByteArray(inputStream);
             return this.upload(data, path);
         } catch (IOException e) {
-            throw new RRException("上传文件失败", e);
+            throw new BackendException("上传文件失败", e);
         }
     }
 

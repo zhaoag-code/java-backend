@@ -1,10 +1,3 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
 
 package io.backend.modules.sys.service.impl;
 
@@ -12,7 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.gson.Gson;
-import io.backend.common.exception.RRException;
+import io.backend.common.exception.BackendException;
 import io.backend.common.utils.PageUtils;
 import io.backend.common.utils.Query;
 import io.backend.modules.sys.dao.SysConfigDao;
@@ -98,7 +91,7 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigDao, SysConfigEnt
 		try {
 			return clazz.newInstance();
 		} catch (Exception e) {
-			throw new RRException("获取参数失败");
+			throw new BackendException("获取参数失败");
 		}
 	}
 }

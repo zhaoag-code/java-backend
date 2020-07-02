@@ -1,17 +1,10 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
 
 package io.backend.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.backend.common.exception.RRException;
+import io.backend.common.exception.BackendException;
 import io.backend.common.utils.Constant;
 import io.backend.common.utils.PageUtils;
 import io.backend.common.utils.Query;
@@ -36,7 +29,6 @@ import java.util.Map;
 /**
  * 系统用户
  *
- * @author Mark sunlightcs@gmail.com
  */
 @Service("sysUserService")
 public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> implements SysUserService {
@@ -139,7 +131,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
 
 		//判断是否越权
 		if(!roleIdList.containsAll(user.getRoleIdList())){
-			throw new RRException("新增用户所选角色，不是本人创建");
+			throw new BackendException("新增用户所选角色，不是本人创建");
 		}
 	}
 }

@@ -1,14 +1,7 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
 
 package io.backend.modules.sys.oauth2;
 
-import io.backend.common.exception.RRException;
+import io.backend.common.exception.BackendException;
 
 import java.security.MessageDigest;
 import java.util.UUID;
@@ -16,7 +9,6 @@ import java.util.UUID;
 /**
  * 生成token
  *
- * @author Mark sunlightcs@gmail.com
  */
 public class TokenGenerator {
 
@@ -46,7 +38,7 @@ public class TokenGenerator {
             byte[] messageDigest = algorithm.digest();
             return toHexString(messageDigest);
         } catch (Exception e) {
-            throw new RRException("生成Token失败", e);
+            throw new BackendException("生成Token失败", e);
         }
     }
 }

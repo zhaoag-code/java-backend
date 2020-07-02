@@ -1,16 +1,9 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
 
 package io.backend.modules.app.interceptor;
 
 
 import io.jsonwebtoken.Claims;
-import io.backend.common.exception.RRException;
+import io.backend.common.exception.BackendException;
 import io.backend.modules.app.utils.JwtUtils;
 import io.backend.modules.app.annotation.Login;
 import org.apache.commons.lang.StringUtils;
@@ -26,7 +19,6 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * 权限(Token)验证
  *
- * @author Mark sunlightcs@gmail.com
  */
 @Component
 public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
@@ -56,12 +48,12 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 
         //凭证为空
         if(StringUtils.isBlank(token)){
-            throw new RRException(jwtUtils.getHeader() + "不能为空", HttpStatus.UNAUTHORIZED.value());
+            throw new BackendException(jwtUtils.getHeader() + "不能为空", HttpStatus.UNAUTHORIZED.value());
         }
 
         Claims claims = jwtUtils.getClaimByToken(token);
         if(claims == null || jwtUtils.isTokenExpired(claims.getExpiration())){
-            throw new RRException(jwtUtils.getHeader() + "失效，请重新登录", HttpStatus.UNAUTHORIZED.value());
+            throw new BackendException(jwtUtils.getHeader() + "失效，请重新登录", HttpStatus.UNAUTHORIZED.value());
         }
 
         //设置userId到request里，后续根据userId，获取用户信息

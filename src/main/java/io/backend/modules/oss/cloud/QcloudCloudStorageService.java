@@ -1,10 +1,3 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
 
 package io.backend.modules.oss.cloud;
 
@@ -14,7 +7,7 @@ import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.request.UploadFileRequest;
 import com.qcloud.cos.sign.Credentials;
-import io.backend.common.exception.RRException;
+import io.backend.common.exception.BackendException;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -23,7 +16,6 @@ import java.io.InputStream;
 /**
  * 腾讯云存储
  *
- * @author Mark sunlightcs@gmail.com
  */
 public class QcloudCloudStorageService extends CloudStorageService {
     private COSClient client;
@@ -60,7 +52,7 @@ public class QcloudCloudStorageService extends CloudStorageService {
 
         JSONObject jsonObject = JSONObject.parseObject(response);
         if(jsonObject.getInteger("code") != 0) {
-            throw new RRException("文件上传失败，" + jsonObject.getString("message"));
+            throw new BackendException("文件上传失败，" + jsonObject.getString("message"));
         }
 
         return config.getQcloudDomain() + path;
@@ -72,7 +64,7 @@ public class QcloudCloudStorageService extends CloudStorageService {
             byte[] data = IOUtils.toByteArray(inputStream);
             return this.upload(data, path);
         } catch (IOException e) {
-            throw new RRException("上传文件失败", e);
+            throw new BackendException("上传文件失败", e);
         }
     }
 

@@ -1,15 +1,8 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
 
 package io.backend.modules.sys.controller;
 
 import io.backend.common.annotation.SysLog;
-import io.backend.common.exception.RRException;
+import io.backend.common.exception.BackendException;
 import io.backend.common.utils.Constant;
 import io.backend.common.utils.R;
 import io.backend.modules.sys.entity.SysMenuEntity;
@@ -18,6 +11,8 @@ import io.backend.modules.sys.service.SysMenuService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -51,6 +46,7 @@ public class SysMenuController extends AbstractController {
 	 */
 	@GetMapping("/list")
 	@RequiresPermissions("sys:menu:list")
+	@Cacheable(value = "menuList")
 	public List<SysMenuEntity> list(){
 		List<SysMenuEntity> menuList = sysMenuService.list();
 		for(SysMenuEntity sysMenuEntity : menuList){
@@ -99,6 +95,7 @@ public class SysMenuController extends AbstractController {
 	@SysLog("保存菜单")
 	@PostMapping("/save")
 	@RequiresPermissions("sys:menu:save")
+	@CacheEvict(value = "menuList",allEntries = true)
 	public R save(@RequestBody SysMenuEntity menu){
 		//数据校验
 		verifyForm(menu);
@@ -114,6 +111,7 @@ public class SysMenuController extends AbstractController {
 	@SysLog("修改菜单")
 	@PostMapping("/update")
 	@RequiresPermissions("sys:menu:update")
+	@CacheEvict(value = "menuList",allEntries = true)
 	public R update(@RequestBody SysMenuEntity menu){
 		//数据校验
 		verifyForm(menu);
@@ -129,6 +127,7 @@ public class SysMenuController extends AbstractController {
 	@SysLog("删除菜单")
 	@PostMapping("/delete/{menuId}")
 	@RequiresPermissions("sys:menu:delete")
+	@CacheEvict(value = "menuList",allEntries = true)
 	public R delete(@PathVariable("menuId") long menuId){
 		if(menuId <= 31){
 			return R.error("系统菜单，不能删除");
@@ -150,17 +149,17 @@ public class SysMenuController extends AbstractController {
 	 */
 	private void verifyForm(SysMenuEntity menu){
 		if(StringUtils.isBlank(menu.getName())){
-			throw new RRException("菜单名称不能为空");
+			throw new BackendException("菜单名称不能为空");
 		}
 		
 		if(menu.getParentId() == null){
-			throw new RRException("上级菜单不能为空");
+			throw new BackendException("上级菜单不能为空");
 		}
 		
 		//菜单
 		if(menu.getType() == Constant.MenuType.MENU.getValue()){
 			if(StringUtils.isBlank(menu.getUrl())){
-				throw new RRException("菜单URL不能为空");
+				throw new BackendException("菜单URL不能为空");
 			}
 		}
 		
@@ -175,7 +174,7 @@ public class SysMenuController extends AbstractController {
 		if(menu.getType() == Constant.MenuType.CATALOG.getValue() ||
 				menu.getType() == Constant.MenuType.MENU.getValue()){
 			if(parentType != Constant.MenuType.CATALOG.getValue()){
-				throw new RRException("上级菜单只能为目录类型");
+				throw new BackendException("上级菜单只能为目录类型");
 			}
 			return ;
 		}
@@ -183,7 +182,7 @@ public class SysMenuController extends AbstractController {
 		//按钮
 		if(menu.getType() == Constant.MenuType.BUTTON.getValue()){
 			if(parentType != Constant.MenuType.MENU.getValue()){
-				throw new RRException("上级菜单只能为菜单类型");
+				throw new BackendException("上级菜单只能为菜单类型");
 			}
 			return ;
 		}

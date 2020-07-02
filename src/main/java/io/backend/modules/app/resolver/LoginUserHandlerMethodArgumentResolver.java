@@ -1,13 +1,7 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
 
 package io.backend.modules.app.resolver;
 
+import io.backend.common.utils.RedisUtils;
 import io.backend.modules.app.annotation.LoginUser;
 import io.backend.modules.app.entity.UserEntity;
 import io.backend.modules.app.interceptor.AuthorizationInterceptor;
@@ -24,12 +18,14 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 /**
  * 有@LoginUser注解的方法参数，注入当前登录用户
  *
- * @author Mark sunlightcs@gmail.com
  */
 @Component
 public class LoginUserHandlerMethodArgumentResolver implements HandlerMethodArgumentResolver {
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private RedisUtils redisUtils;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -47,6 +43,14 @@ public class LoginUserHandlerMethodArgumentResolver implements HandlerMethodArgu
 
         //获取用户信息
         UserEntity user = userService.getById((Long)object);
+        //获取用户信息
+        Long userId = (Long)object;
+        UserEntity userEntity;
+        userEntity = redisUtils.get(AuthorizationInterceptor.USER_KEY + "_" + userId,UserEntity.class);
+        if(null == userEntity){
+            userEntity = userService.getById(userId);
+            redisUtils.set(AuthorizationInterceptor.USER_KEY + "_" + userId,userEntity);
+        }
 
         return user;
     }

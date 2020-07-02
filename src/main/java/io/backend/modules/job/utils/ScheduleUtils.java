@@ -1,14 +1,7 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
 
 package io.backend.modules.job.utils;
 
-import io.backend.common.exception.RRException;
+import io.backend.common.exception.BackendException;
 import io.backend.common.utils.Constant;
 import io.backend.modules.job.entity.ScheduleJobEntity;
 import org.quartz.*;
@@ -16,7 +9,6 @@ import org.quartz.*;
 /**
  * 定时任务工具类
  *
- * @author Mark sunlightcs@gmail.com
  */
 public class ScheduleUtils {
     private final static String JOB_NAME = "TASK_";
@@ -42,7 +34,7 @@ public class ScheduleUtils {
         try {
             return (CronTrigger) scheduler.getTrigger(getTriggerKey(jobId));
         } catch (SchedulerException e) {
-            throw new RRException("获取定时任务CronTrigger出现异常", e);
+            throw new BackendException("获取定时任务CronTrigger出现异常", e);
         }
     }
 
@@ -71,7 +63,7 @@ public class ScheduleUtils {
             	pauseJob(scheduler, scheduleJob.getJobId());
             }
         } catch (SchedulerException e) {
-            throw new RRException("创建定时任务失败", e);
+            throw new BackendException("创建定时任务失败", e);
         }
     }
     
@@ -102,7 +94,7 @@ public class ScheduleUtils {
             }
             
         } catch (SchedulerException e) {
-            throw new RRException("更新定时任务失败", e);
+            throw new BackendException("更新定时任务失败", e);
         }
     }
 
@@ -117,7 +109,7 @@ public class ScheduleUtils {
         	
             scheduler.triggerJob(getJobKey(scheduleJob.getJobId()), dataMap);
         } catch (SchedulerException e) {
-            throw new RRException("立即执行定时任务失败", e);
+            throw new BackendException("立即执行定时任务失败", e);
         }
     }
 
@@ -128,7 +120,7 @@ public class ScheduleUtils {
         try {
             scheduler.pauseJob(getJobKey(jobId));
         } catch (SchedulerException e) {
-            throw new RRException("暂停定时任务失败", e);
+            throw new BackendException("暂停定时任务失败", e);
         }
     }
 
@@ -139,7 +131,7 @@ public class ScheduleUtils {
         try {
             scheduler.resumeJob(getJobKey(jobId));
         } catch (SchedulerException e) {
-            throw new RRException("暂停定时任务失败", e);
+            throw new BackendException("暂停定时任务失败", e);
         }
     }
 
@@ -150,7 +142,7 @@ public class ScheduleUtils {
         try {
             scheduler.deleteJob(getJobKey(jobId));
         } catch (SchedulerException e) {
-            throw new RRException("删除定时任务失败", e);
+            throw new BackendException("删除定时任务失败", e);
         }
     }
 }

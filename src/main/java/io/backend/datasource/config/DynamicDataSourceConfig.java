@@ -1,10 +1,3 @@
-/**
- * Copyright (c) 2018 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
 
 package io.backend.datasource.config;
 
@@ -23,7 +16,6 @@ import java.util.Map;
 /**
  * 配置多数据源
  *
- * @author Mark sunlightcs@gmail.com
  */
 @Configuration
 @EnableConfigurationProperties(DynamicDataSourceProperties.class)

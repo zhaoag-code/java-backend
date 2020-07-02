@@ -1,17 +1,10 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
 
 package io.backend.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.backend.common.exception.RRException;
+import io.backend.common.exception.BackendException;
 import io.backend.common.utils.Constant;
 import io.backend.common.utils.PageUtils;
 import io.backend.common.utils.Query;
@@ -34,7 +27,6 @@ import java.util.Map;
 /**
  * 角色
  *
- * @author Mark sunlightcs@gmail.com
  */
 @Service("sysRoleService")
 public class SysRoleServiceImpl extends ServiceImpl<SysRoleDao, SysRoleEntity> implements SysRoleService {
@@ -118,7 +110,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleDao, SysRoleEntity> i
 		
 		//判断是否越权
 		if(!menuIdList.containsAll(role.getMenuIdList())){
-			throw new RRException("新增角色的权限，已超出你的权限范围");
+			throw new BackendException("新增角色的权限，已超出你的权限范围");
 		}
 	}
 }
