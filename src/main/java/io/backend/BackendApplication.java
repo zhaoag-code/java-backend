@@ -1,4 +1,3 @@
-
 package io.backend;
 
 import org.springframework.boot.SpringApplication;
