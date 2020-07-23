@@ -41,13 +41,8 @@
 		<fastjson.version>1.2.60</fastjson.version>
 		<hutool.version>4.1.1</hutool.version>
 		<lombok.version>1.18.4</lombok.version>
-
-		<!--wagon plugin 配置-->
-		<service-path>/work/renren</service-path>
-		<pack-name>${project.artifactId}-${project.version}.jar</pack-name>
-		<remote-addr>192.168.1.10:22</remote-addr>
-		<remote-username>root</remote-username>
-		<remote-passwd>123456</remote-passwd>
+		<javax-validation.version>2.0.1.Final</javax-validation.version>
+		<hibernate-validator.version>6.0.17.Final</hibernate-validator.version>
 	</properties>
 
 	<dependencies>
@@ -231,6 +226,16 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<version>${lombok.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>${javax-validation.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>${hibernate-validator.version}</version>
 		</dependency>
 	</dependencies>
 
