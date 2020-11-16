@@ -34,10 +34,10 @@ spring:
             multi-statement-allow: true
   redis:
     open: true
-    database: 2
-    host: t.taxori.com
+    database: 0
+    host: localhost
     port: 6379
-    password: root.123   # 密码（默认为空）
+    password: root   # 密码（默认为空）
     timeout: 6000ms  # 连接超时时长（毫秒）
     jedis:
       pool:
