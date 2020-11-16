@@ -27,12 +27,11 @@ backend
 ```
 
 **技术选型：** 
-- 核心框架：Spring Boot 2.3.1
-- 安全框架：Apache Shiro 1.4
-- 视图框架：Spring MVC 5.0
+- 核心框架：Spring Boot 2.3.1.RELEASE
+- 安全框架：Apache Shiro 1.7.0
 - 持久层框架：MyBatis-Plus 3.4.0
-- 定时器：Quartz 2.3
-- 数据库连接池：Druid 1.0
+- 定时器：Quartz 2.3.2
+- 数据库连接池：Druid 1.1.13
 - 日志管理：SLF4J 1.7、Log4j
 - 页面交互：Vue2.x 
 <br> 
