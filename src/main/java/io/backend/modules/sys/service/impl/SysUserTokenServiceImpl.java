@@ -3,10 +3,12 @@ package io.backend.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.backend.common.utils.R;
+import io.backend.common.utils.RedisUtils;
 import io.backend.modules.sys.dao.SysUserTokenDao;
 import io.backend.modules.sys.entity.SysUserTokenEntity;
 import io.backend.modules.sys.oauth2.TokenGenerator;
 import io.backend.modules.sys.service.SysUserTokenService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -16,6 +18,10 @@ import java.util.Date;
 public class SysUserTokenServiceImpl extends ServiceImpl<SysUserTokenDao, SysUserTokenEntity> implements SysUserTokenService {
 	//12小时后过期
 	private final static int EXPIRE = 3600 * 12;
+
+	@Autowired
+	private RedisUtils redisUtils;
+
 
 
 	@Override
@@ -40,6 +46,7 @@ public class SysUserTokenServiceImpl extends ServiceImpl<SysUserTokenDao, SysUse
 			//保存token
 			this.save(tokenEntity);
 		}else{
+			redisUtils.delete(tokenEntity.getToken());
 			tokenEntity.setToken(token);
 			tokenEntity.setUpdateTime(now);
 			tokenEntity.setExpireTime(expireTime);
@@ -59,9 +66,14 @@ public class SysUserTokenServiceImpl extends ServiceImpl<SysUserTokenDao, SysUse
 		String token = TokenGenerator.generateValue();
 
 		//修改token
-		SysUserTokenEntity tokenEntity = new SysUserTokenEntity();
-		tokenEntity.setUserId(userId);
-		tokenEntity.setToken(token);
-		this.updateById(tokenEntity);
+		SysUserTokenEntity tokenEntity = this.getById(userId);
+		if(tokenEntity != null){
+			redisUtils.delete(tokenEntity.getToken());
+		}else {
+			tokenEntity = new SysUserTokenEntity();
+			tokenEntity.setUserId(userId);
+			tokenEntity.setToken(token);
+			this.updateById(tokenEntity);
+		}
 	}
 }
