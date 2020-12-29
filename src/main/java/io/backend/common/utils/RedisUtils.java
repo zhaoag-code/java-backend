@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -69,6 +71,14 @@ public class RedisUtils {
 
     public void delete(String key) {
         redisTemplate.delete(key);
+    }
+
+    public void deleteByKeys(Set keys) {
+        redisTemplate.delete(keys);
+    }
+
+    public Set<String> keys(String keys) {
+        return redisTemplate.keys(keys);
     }
 
     /**

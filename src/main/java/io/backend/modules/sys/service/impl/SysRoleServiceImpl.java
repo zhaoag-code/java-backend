@@ -8,6 +8,7 @@ import io.backend.common.exception.BackendException;
 import io.backend.common.utils.Constant;
 import io.backend.common.utils.PageUtils;
 import io.backend.common.utils.Query;
+import io.backend.common.utils.RedisUtils;
 import io.backend.modules.sys.dao.SysRoleDao;
 import io.backend.modules.sys.entity.SysRoleEntity;
 import io.backend.modules.sys.service.SysRoleMenuService;
@@ -19,10 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 角色
@@ -34,8 +32,10 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleDao, SysRoleEntity> i
 	private SysRoleMenuService sysRoleMenuService;
 	@Autowired
 	private SysUserService sysUserService;
-    @Autowired
-    private SysUserRoleService sysUserRoleService;
+	@Autowired
+	private SysUserRoleService sysUserRoleService;
+	@Autowired
+	private RedisUtils redisUtils;
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
@@ -43,55 +43,63 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleDao, SysRoleEntity> i
 		Long createUserId = (Long)params.get("createUserId");
 
 		IPage<SysRoleEntity> page = this.page(
-			new Query<SysRoleEntity>().getPage(params),
-			new QueryWrapper<SysRoleEntity>()
-				.like(StringUtils.isNotBlank(roleName),"role_name", roleName)
-				.eq(createUserId != null,"create_user_id", createUserId)
+				new Query<SysRoleEntity>().getPage(params),
+				new QueryWrapper<SysRoleEntity>()
+						.like(StringUtils.isNotBlank(roleName),"role_name", roleName)
+						.eq(createUserId != null,"create_user_id", createUserId)
 		);
 
 		return new PageUtils(page);
 	}
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void saveRole(SysRoleEntity role) {
-        role.setCreateTime(new Date());
-        this.save(role);
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void saveRole(SysRoleEntity role) {
+		role.setCreateTime(new Date());
+		this.save(role);
 
-        //检查权限是否越权
-        checkPrems(role);
+		//检查权限是否越权
+		checkPrems(role);
 
-        //保存角色与菜单关系
-        sysRoleMenuService.saveOrUpdate(role.getRoleId(), role.getMenuIdList());
-    }
+		//保存角色与菜单关系
+		sysRoleMenuService.saveOrUpdate(role.getRoleId(), role.getMenuIdList());
+	}
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void update(SysRoleEntity role) {
-        this.updateById(role);
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void update(SysRoleEntity role) {
+		this.updateById(role);
 
-        //检查权限是否越权
-        checkPrems(role);
+		//检查权限是否越权
+		checkPrems(role);
 
-        //更新角色与菜单关系
-        sysRoleMenuService.saveOrUpdate(role.getRoleId(), role.getMenuIdList());
-    }
+		//更新角色需要清除用户缓存的权限列表
+		Set<String> keys  = redisUtils.keys("permsSet_*");
+		redisUtils.deleteByKeys(keys);
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void deleteBatch(Long[] roleIds) {
-        //删除角色
-        this.removeByIds(Arrays.asList(roleIds));
+		//更新角色与菜单关系
+		sysRoleMenuService.saveOrUpdate(role.getRoleId(), role.getMenuIdList());
+	}
 
-        //删除角色与菜单关联
-        sysRoleMenuService.deleteBatch(roleIds);
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void deleteBatch(Long[] roleIds) {
+		//删除角色
+		this.removeByIds(Arrays.asList(roleIds));
 
-        //删除角色与用户关联
-        sysUserRoleService.deleteBatch(roleIds);
-    }
+		//删除角色与菜单关联
+		sysRoleMenuService.deleteBatch(roleIds);
+
+		//删除角色与用户关联
+		sysUserRoleService.deleteBatch(roleIds);
+
+		//删除角色需要清除用户缓存的权限列表
+		Set<String> keys  = redisUtils.keys("permsSet_*");
+		redisUtils.deleteByKeys(keys);
+	}
 
 
-    @Override
+	@Override
 	public List<Long> queryRoleIdList(Long createUserId) {
 		return baseMapper.queryRoleIdList(createUserId);
 	}
@@ -104,10 +112,10 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleDao, SysRoleEntity> i
 		if(role.getCreateUserId() == Constant.SUPER_ADMIN){
 			return ;
 		}
-		
+
 		//查询用户所拥有的菜单列表
 		List<Long> menuIdList = sysUserService.queryAllMenuId(role.getCreateUserId());
-		
+
 		//判断是否越权
 		if(!menuIdList.containsAll(role.getMenuIdList())){
 			throw new BackendException("新增角色的权限，已超出你的权限范围");
